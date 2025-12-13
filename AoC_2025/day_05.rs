@@ -19,27 +19,25 @@ fn part_1(inventory_low: &Vec<usize>, inventory_high: &Vec<usize>, numbers: &Vec
 }
 
 fn part_2(inventory_low: &Vec<usize>, inventory_high: &Vec<usize>) -> usize {
-    let mut last_id = 0;
     let mut ids = 0;
-    for idx in 0..inventory_low.len() {
-        // println!("checking range {}-{}", inventory_low[idx], inventory_high[idx]);
-        // ids += inventory_high[idx] - inventory_low[idx] + 1;
-        if last_id > inventory_low[idx]{
-            // let diff = last_id - inventory_low[idx] + 1;
-            // println!("overlapping with the last range: {}", last_id);
-            // ids -= diff;
-            if inventory_high[idx] > last_id{
-                // println!("adding: {}", inventory_high[idx] - last_id + 1);
-                ids += inventory_high[idx] - last_id + 1; // count range
+    let mut inventory_ranges: Vec<Vec<usize>> = vec![vec![inventory_low[0],inventory_high[0]]];
+    let mut ranges = 0;
+    for idx in 1..inventory_low.len() {
+        if inventory_low[idx] <= inventory_ranges[ranges][1]{
+            if inventory_high[idx] > inventory_ranges[ranges][1]{
+                inventory_ranges[ranges][1] = inventory_high[idx];
             }
+        } else if inventory_low[idx] + 1 == inventory_ranges[ranges][1] {
+            inventory_ranges[ranges][1] = inventory_high[idx];
         } else {
-            // println!("adding: {}", inventory_high[idx] - inventory_low[idx] + 1);
-            ids += inventory_high[idx] - inventory_low[idx] + 1; // count range
-        }
-        if inventory_high[idx] > last_id {
-            last_id = inventory_high[idx]; // remember highest value of range
+            inventory_ranges.push(vec![inventory_low[idx],inventory_high[idx]]);
+            ranges += 1;
         }
     }
+    for range in inventory_ranges{
+        ids += range[1] - range[0] + 1;
+    }
+
     return ids;
 }
 
@@ -74,6 +72,5 @@ fn main(){
     let (inventory_low, inventory_high): (Vec<_>, Vec<_>) = pairs.into_iter().unzip();
 
     println!("Part 1: {}", part_1(&inventory_low, &inventory_high, &numbers));
-    println!("Part 2: \n{}", part_2(&inventory_low, &inventory_high));
-    println!("42792414823769 is too low and\n319927450805369 is too low\n338693411431517 is too high");
+    println!("Part 2: {}", part_2(&inventory_low, &inventory_high));
 }
